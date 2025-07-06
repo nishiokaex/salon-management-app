@@ -2,7 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { BottomNavigation } from 'react-native-paper';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+// import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { CommonActions } from '@react-navigation/native';
 
 import DashboardScreen from '../screens/DashboardScreen';
@@ -64,9 +64,7 @@ export default function MainNavigator() {
           component={DashboardScreen}
           options={{
             tabBarLabel: 'ホーム',
-            tabBarIcon: ({ color, size }) => (
-              <Icon name="home" color={color} size={size} />
-            ),
+            tabBarIcon: ({ color, size }) => null,
           }}
         />
         <Tab.Screen
@@ -74,9 +72,7 @@ export default function MainNavigator() {
           component={BookingScreen}
           options={{
             tabBarLabel: '予約',
-            tabBarIcon: ({ color, size }) => (
-              <Icon name="calendar" color={color} size={size} />
-            ),
+            tabBarIcon: ({ color, size }) => null,
           }}
         />
         <Tab.Screen
@@ -84,9 +80,7 @@ export default function MainNavigator() {
           component={CustomerScreen}
           options={{
             tabBarLabel: '顧客',
-            tabBarIcon: ({ color, size }) => (
-              <Icon name="account-group" color={color} size={size} />
-            ),
+            tabBarIcon: ({ color, size }) => null,
           }}
         />
         <Tab.Screen
@@ -94,9 +88,7 @@ export default function MainNavigator() {
           component={InventoryScreen}
           options={{
             tabBarLabel: '在庫',
-            tabBarIcon: ({ color, size }) => (
-              <Icon name="package-variant" color={color} size={size} />
-            ),
+            tabBarIcon: ({ color, size }) => null,
           }}
         />
       </Tab.Navigator>

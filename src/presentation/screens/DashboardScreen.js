@@ -60,23 +60,23 @@ export default function DashboardScreen() {
       <ScrollView style={{ flex: 1, padding: 16 }}>
         <View style={{ marginBottom: 16 }}>
           <Title>今日の概要</Title>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
-            <Surface style={{ flex: 1, minWidth: 150, padding: 16, borderRadius: 8 }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 8 }}>
+            <Surface style={{ flex: 1, minWidth: 150, padding: 16, borderRadius: 8, marginRight: 8, marginBottom: 8 }}>
               <Text variant="bodySmall">今日の売上</Text>
-              <Text variant="headlineSmall">{formatCurrency(dashboardSummary?.todayRevenue)}</Text>
+              <Text variant="headlineSmall">{formatCurrency(dashboardSummary?.todayRevenue || 0)}</Text>
             </Surface>
-            <Surface style={{ flex: 1, minWidth: 150, padding: 16, borderRadius: 8 }}>
+            <Surface style={{ flex: 1, minWidth: 150, padding: 16, borderRadius: 8, marginRight: 8, marginBottom: 8 }}>
               <Text variant="bodySmall">今日の予約</Text>
-              <Text variant="headlineSmall">{dashboardSummary?.todayBookingCount || 0}件</Text>
+              <Text variant="headlineSmall">{(dashboardSummary?.todayBookingCount || 0).toString()}件</Text>
             </Surface>
-            <Surface style={{ flex: 1, minWidth: 150, padding: 16, borderRadius: 8 }}>
+            <Surface style={{ flex: 1, minWidth: 150, padding: 16, borderRadius: 8, marginRight: 8, marginBottom: 8 }}>
               <Text variant="bodySmall">登録顧客</Text>
-              <Text variant="headlineSmall">{dashboardSummary?.totalCustomers || 0}人</Text>
+              <Text variant="headlineSmall">{(dashboardSummary?.totalCustomers || 0).toString()}人</Text>
             </Surface>
-            <Surface style={{ flex: 1, minWidth: 150, padding: 16, borderRadius: 8 }}>
+            <Surface style={{ flex: 1, minWidth: 150, padding: 16, borderRadius: 8, marginBottom: 8 }}>
               <Text variant="bodySmall">在庫アラート</Text>
-              <Text variant="headlineSmall">{dashboardSummary?.lowStockCount || 0}件</Text>
-              {dashboardSummary?.lowStockCount > 0 && (
+              <Text variant="headlineSmall">{(dashboardSummary?.lowStockCount || 0).toString()}件</Text>
+{dashboardSummary?.lowStockCount > 0 ? (
                 <Chip 
                   icon="alert" 
                   mode="outlined" 
@@ -85,7 +85,7 @@ export default function DashboardScreen() {
                 >
                   要確認
                 </Chip>
-              )}
+              ) : null}
             </Surface>
           </View>
         </View>
@@ -98,14 +98,14 @@ export default function DashboardScreen() {
                 <Card.Content>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                     <View style={{ flex: 1 }}>
-                      <Text variant="titleMedium">{booking.customerName}</Text>
-                      <Text variant="bodyMedium">{booking.service}</Text>
-                      <Text variant="bodySmall">{booking.time}</Text>
+                      <Text variant="titleMedium">{(booking.customerName || booking.customer?.name || '顧客名不明').toString()}</Text>
+                      <Text variant="bodyMedium">{(booking.service || '施術内容なし').toString()}</Text>
+                      <Text variant="bodySmall">{(booking.time || '時間不明').toString()}</Text>
                     </View>
                     <View style={{ alignItems: 'flex-end' }}>
-                      <Text variant="titleMedium">{formatCurrency(booking.price)}</Text>
+                      <Text variant="titleMedium">{formatCurrency(booking.price || 0)}</Text>
                       <Chip mode="outlined" compact>
-                        {booking.getStatusText ? booking.getStatusText() : (booking.status === 'scheduled' ? '予約済み' : booking.status === 'completed' ? '完了' : booking.status === 'cancelled' ? 'キャンセル' : booking.status)}
+                        {(booking.getStatusText ? booking.getStatusText() : (booking.status === 'scheduled' ? '予約済み' : booking.status === 'completed' ? '完了' : booking.status === 'cancelled' ? 'キャンセル' : booking.status || '不明')).toString()}
                       </Chip>
                     </View>
                   </View>

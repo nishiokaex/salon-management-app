@@ -50,8 +50,23 @@ export default function BookingScreen() {
 
   const handleCreateBooking = async () => {
     try {
+      // 正規化された形式で予約を作成
       await createBooking({
-        ...newBooking,
+        customerId: null, // 新しい顧客システムでは既存の顧客IDが必要
+        date: newBooking.date,
+        time: newBooking.time,
+        notes: '',
+        // 暫定的に古いサービス形式をサポート
+        services: [{
+          serviceId: null,
+          price: parseInt(newBooking.price) || 0,
+          duration: 60, // デフォルト60分
+          staffMember: '',
+          notes: newBooking.service
+        }],
+        // 後方互換性のため
+        customerName: newBooking.customerName,
+        service: newBooking.service,
         price: parseInt(newBooking.price) || 0
       });
       setNewBooking({
@@ -96,8 +111,8 @@ export default function BookingScreen() {
       date: booking.date,
       time: booking.time,
       customerName: booking.customerName,
-      service: booking.service,
-      price: booking.price.toString()
+      service: booking.service || '施術内容なし',
+      price: (booking.price || booking.totalPrice || 0).toString()
     });
     setShowEditModal(true);
   };
@@ -105,7 +120,13 @@ export default function BookingScreen() {
   const handleEditBooking = async () => {
     try {
       await updateBooking(editingBooking.id, {
-        ...newBooking,
+        date: newBooking.date,
+        time: newBooking.time,
+        totalPrice: parseInt(newBooking.price) || 0,
+        notes: newBooking.service, // 暫定的にnotesに保存
+        // 後方互換性のため
+        customerName: newBooking.customerName,
+        service: newBooking.service,
         price: parseInt(newBooking.price) || 0
       });
       setShowEditModal(false);
@@ -153,18 +174,18 @@ export default function BookingScreen() {
               <Card.Content>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <View style={{ flex: 1 }}>
-                    <Text variant="titleLarge">{booking.customerName}</Text>
+                    <Text variant="titleLarge">{(booking.customerName || booking.customer?.name || '顧客名不明').toString()}</Text>
                     <Text variant="bodyLarge" style={{ marginTop: 4 }}>
-                      {booking.service}
+                      {(booking.service || '施術内容なし').toString()}
                     </Text>
                     <Text variant="bodyMedium" style={{ marginTop: 2, color: '#6B7280' }}>
-                      {booking.date} {booking.time}
+                      {(booking.date || '日付不明').toString()} {(booking.time || '時間不明').toString()}
                     </Text>
                   </View>
                   
                   <View style={{ alignItems: 'flex-end' }}>
                     <Text variant="titleMedium" style={{ fontWeight: 'bold' }}>
-                      {formatCurrency(booking.price)}
+                      {formatCurrency(booking.price || booking.totalPrice || 0)}
                     </Text>
                     <Chip 
                       mode="outlined" 
@@ -175,7 +196,7 @@ export default function BookingScreen() {
                       }}
                       textStyle={{ color: getStatusColor(booking.status) }}
                     >
-                      {booking.getStatusText()}
+                      {(booking.getStatusText ? booking.getStatusText() : (booking.status === 'scheduled' ? '予約済み' : booking.status === 'completed' ? '完了' : booking.status === 'cancelled' ? 'キャンセル' : booking.status || '不明')).toString()}
                     </Chip>
                   </View>
                 </View>

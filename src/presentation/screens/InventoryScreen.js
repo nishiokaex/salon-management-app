@@ -199,7 +199,7 @@ export default function InventoryScreen() {
                   }}
                   textStyle={{ color: '#DC2626' }}
                 >
-                  {product.name}: {product.currentStock}{product.unit}
+{product.name}: {(product.currentStock || 0).toString()}{product.unit || ''}
                 </Chip>
               ))}
             </View>
@@ -216,14 +216,14 @@ export default function InventoryScreen() {
               <Card.Content>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <View style={{ flex: 1 }}>
-                    <Text variant="titleLarge">{product.name}</Text>
+                    <Text variant="titleLarge">{(product.name || '商品名不明').toString()}</Text>
                     <Chip mode="outlined" compact style={{ marginTop: 4, alignSelf: 'flex-start' }}>
-                      {product.category}
+                      {(product.category || 'カテゴリなし').toString()}
                     </Chip>
                     
                     <View style={{ marginTop: 8 }}>
                       <Text variant="bodyMedium">
-                        在庫数: {product.currentStock}{product.unit} / 最小在庫: {product.minStock}{product.unit}
+                        在庫数: {(product.currentStock || 0).toString()}{product.unit || ''} / 最小在庫: {(product.minStock || 0).toString()}{product.unit || ''}
                       </Text>
                       <ProgressBar 
                         progress={Math.min(product.currentStock / Math.max(product.minStock * 2, 1), 1)}
@@ -247,11 +247,11 @@ export default function InventoryScreen() {
                       style={{ 
                         marginTop: 8, 
                         alignSelf: 'flex-start',
-                        borderColor: product.getStockStatusColor()
+                        borderColor: product.getStockStatusColor ? product.getStockStatusColor() : '#666'
                       }}
-                      textStyle={{ color: product.getStockStatusColor() }}
+                      textStyle={{ color: product.getStockStatusColor ? product.getStockStatusColor() : '#666' }}
                     >
-                      {product.getStockStatusText()}
+                      {(product.getStockStatusText ? product.getStockStatusText() : '在庫状況不明').toString()}
                     </Chip>
                   </View>
                   
@@ -492,7 +492,7 @@ export default function InventoryScreen() {
         >
           <Title>在庫調整</Title>
           <Text style={{ marginTop: 8 }}>
-            {editingProduct?.name} (現在: {editingProduct?.currentStock}{editingProduct?.unit})
+            {editingProduct?.name || ''} (現在: {(editingProduct?.currentStock || 0).toString()}{editingProduct?.unit || ''})
           </Text>
           
           <TextInput

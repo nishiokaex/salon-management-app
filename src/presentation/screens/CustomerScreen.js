@@ -129,10 +129,22 @@ export default function CustomerScreen() {
 
   const handleCreateBooking = async () => {
     try {
+      // 正規化された形式で予約を作成
       await createBooking({
-        ...newBooking,
         customerId: bookingCustomer.id,
+        date: newBooking.date,
+        time: newBooking.time,
+        notes: newBooking.notes,
+        services: [{
+          serviceId: null,
+          price: Number(newBooking.price),
+          duration: 60, // デフォルト60分
+          staffMember: '',
+          notes: newBooking.service
+        }],
+        // 後方互換性のため
         customerName: bookingCustomer.name,
+        service: newBooking.service,
         price: Number(newBooking.price)
       });
       setShowBookingModal(false);
@@ -190,44 +202,45 @@ export default function CustomerScreen() {
                 <Card.Content>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <View style={{ flex: 1 }}>
-                      <Text variant="titleLarge">{customer.name}</Text>
+                      <Text variant="titleLarge">{(customer.name || '顧客名不明').toString()}</Text>
                       
                       <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 8 }}>
                         <Chip mode="outlined" compact style={{ marginRight: 8, marginBottom: 4 }}>
-                          来店回数: {customer.visitCount}回
+                          来店回数: {(customer.visitCount || 0).toString()}回
                         </Chip>
                         <Chip mode="outlined" compact style={{ marginBottom: 4 }}>
-                          最終来店: {customer.getLastVisitString()}
+                          最終来店: {(customer.getLastVisitString ? customer.getLastVisitString() : 
+                            (customer.lastVisit ? new Date(customer.lastVisit).toLocaleDateString('ja-JP') : '来店履歴なし')).toString()}
                         </Chip>
                       </View>
 
-                      {customer.phone && (
+{customer.phone ? (
                         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
                           <IconButton 
                             icon="phone" 
                             size={20} 
                             onPress={() => makePhoneCall(customer.phone)}
                           />
-                          <Text variant="bodyMedium">{customer.phone}</Text>
+                          <Text variant="bodyMedium">{customer.phone.toString()}</Text>
                         </View>
-                      )}
+                      ) : null}
 
-                      {customer.email && (
+                      {customer.email ? (
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                           <IconButton 
                             icon="email" 
                             size={20} 
                             onPress={() => sendEmail(customer.email)}
                           />
-                          <Text variant="bodyMedium">{customer.email}</Text>
+                          <Text variant="bodyMedium">{customer.email.toString()}</Text>
                         </View>
-                      )}
+                      ) : null}
 
-                      {customer.notes && (
+                      {customer.notes ? (
                         <Text variant="bodySmall" style={{ marginTop: 8, fontStyle: 'italic' }}>
-                          {customer.notes}
+                          {customer.notes.toString()}
                         </Text>
-                      )}
+                      ) : null}
                     </View>
                     
                     <View style={{ flexDirection: 'row' }}>

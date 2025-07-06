@@ -5,12 +5,12 @@ export class DashboardUseCase {
     this.productRepository = productRepository;
   }
 
-  // ダッシュボード用のサマリーデータを取得
+  // ダッシュボード用のサマリーデータを取得（顧客名解決付き）
   async getDashboardSummary() {
     try {
       const [
         todayRevenue,
-        todayBookings,
+        todayBookingsRaw,
         totalCustomers,
         lowStockCount
       ] = await Promise.all([
@@ -19,6 +19,24 @@ export class DashboardUseCase {
         this.customerRepository.getTotalCount(),
         this.productRepository.getLowStockCount()
       ]);
+
+      // 今日の予約に顧客名を解決
+      const todayBookings = await Promise.all(
+        todayBookingsRaw.map(async (booking) => {
+          const enrichedBooking = { ...booking };
+          
+          if (booking.customerId) {
+            const customer = await this.customerRepository.getById(booking.customerId);
+            enrichedBooking.customerName = customer ? customer.name : '不明な顧客';
+          } else if (booking.customerName) {
+            enrichedBooking.customerName = booking.customerName;
+          } else {
+            enrichedBooking.customerName = '不明な顧客';
+          }
+          
+          return enrichedBooking;
+        })
+      );
 
       return {
         todayRevenue,
@@ -32,10 +50,30 @@ export class DashboardUseCase {
     }
   }
 
-  // 今日の予約一覧を取得
+  // 今日の予約一覧を取得（顧客名解決付き）
   async getTodayBookings() {
     try {
-      return await this.bookingRepository.getTodayBookings();
+      const todayBookingsRaw = await this.bookingRepository.getTodayBookings();
+      
+      // 今日の予約に顧客名を解決
+      const todayBookings = await Promise.all(
+        todayBookingsRaw.map(async (booking) => {
+          const enrichedBooking = { ...booking };
+          
+          if (booking.customerId) {
+            const customer = await this.customerRepository.getById(booking.customerId);
+            enrichedBooking.customerName = customer ? customer.name : '不明な顧客';
+          } else if (booking.customerName) {
+            enrichedBooking.customerName = booking.customerName;
+          } else {
+            enrichedBooking.customerName = '不明な顧客';
+          }
+          
+          return enrichedBooking;
+        })
+      );
+      
+      return todayBookings;
     } catch (error) {
       throw new Error(`Failed to get today's bookings: ${error.message}`);
     }
